@@ -37,49 +37,39 @@ const MORSE_TABLE = {
     '-----':  '0',
 };
 
-function parseToMorse(str) {
-    let strReplace = str.replace(/00/g,'');
-    strReplace = strReplace.replace(/10/g,'.');
-    strReplace = strReplace.replace(/11/g,'-');
-    return strReplace;
+const code_table = {
+    ".":"10",
+    "-":"11"
+};
+
+let binary_morse_table = {"**********": " "};
+
+convertTable();
+function decode(expr) {
+    let result = "";
+    for (let i = 0; i < expr.length; i += 10) {
+        let code = expr.substr(i, 10);
+        result += binary_morse_table[code];
+    }
+
+    return result;
+
 }
 
-function decode(expr) {
-    let result = '';
-    let delStr = String(expr);
-    let arrayOfString = [];
-
-    let indexChar = 0;
-    while (delStr.length>=10) {
-        let subStr = delStr.slice(indexChar, indexChar + 10);
-        if (subStr === '**********') {
-            subStr = ' ';
+function convertTable() {
+    let cKey;
+    for (let key in MORSE_TABLE) {
+        cKey = "";
+        for (let char of key) {
+            cKey += code_table[char];
         }
-        arrayOfString.push(subStr);
-        delStr = delStr.slice(10, delStr.length);        
-    }
-
-    for (let index = 0; index < arrayOfString.length; index++) {
-        if (arrayOfString[index] != ' ') {
-            arrayOfString[index] = parseToMorse(arrayOfString[index]);  
-        }      
-    }
-    
-    for (let index = 0; index < arrayOfString.length; index++) {
-        if (arrayOfString[index] != ' ') {
-            result += MORSE_TABLE[arrayOfString[index]];
+        while (cKey.length < 10) {
+            cKey = "0" + cKey;
         }
-        else {
-            result += ' ';
-        }
-        
+        binary_morse_table[cKey] = MORSE_TABLE[key];
     }
-    
-    return result;
 }
 
 module.exports = {
     decode
 }
-
-//console.log(decode("00101010100000000010001011101000101110100000111111**********00001011110000111111000010111000101110100000111010"))
